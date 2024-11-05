@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 
-public delegate void PutMoneyEvent(int sum);
-public delegate void WithdrawMoneyEvent(int sum);
-public delegate void PinChangedEvent(int sum);
+public delegate void CardHandler(int sum);
 
 namespace CreditCardClass
 {
@@ -31,9 +29,9 @@ namespace CreditCardClass
         private int sum;
         private int pin;
 
-        private PutMoneyEvent putEvent;
-        private WithdrawMoneyEvent withdrawEvent;
-        public event PinChangedEvent OnPinChanged;
+        public event CardHandler PutEvent;
+        public event CardHandler WithdrawEvent;
+        public event CardHandler OnPinChanged;
 
         private string Id { get; }
         public string Name { get; }
@@ -124,14 +122,14 @@ namespace CreditCardClass
 
         public void SubscribeForPut()
         {
-            putEvent = Printers.PrintPutMoney;
-            putEvent += PrintAccountMoney;
+            PutEvent = Printers.PrintPutMoney;
+            PutEvent += PrintAccountMoney;
         }
 
         public void SubscribeForWithdraw()
         {
-            withdrawEvent = Printers.PrintWithdrawMoney;
-            withdrawEvent += PrintAccountMoney;
+            WithdrawEvent = Printers.PrintWithdrawMoney;
+            WithdrawEvent += PrintAccountMoney;
         }
 
         public void SubscribeForPinChanged()
@@ -142,13 +140,13 @@ namespace CreditCardClass
         public void PutMoney(int amount)
         {
             Sum += amount;
-            putEvent?.Invoke(amount);
+            PutEvent?.Invoke(amount);
         }
 
         public void WithdrawMoney(int amount)
         {
             Sum -= amount;
-            withdrawEvent?.Invoke(amount);
+            WithdrawEvent?.Invoke(amount);
         }
 
     }
